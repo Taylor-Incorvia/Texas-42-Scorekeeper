@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-felt: #0f1115;
+  --color-felt-soft: #171a21;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-felt);
+  color: white;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* The board is a fixed, single screen — nothing here should ever scroll or be
+   dragged around, and stray text selection makes the tap targets feel broken. */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input {
+  -webkit-user-select: text;
+  user-select: text;
+}
