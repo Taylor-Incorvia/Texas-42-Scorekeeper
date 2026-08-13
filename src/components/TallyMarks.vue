@@ -1,13 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps({
-  count: { type: Number, required: true },
-})
+const props = defineProps<{ count: number }>()
 
 // Marks are drawn the way they'd be drawn on the paper this replaces: gates of
 // five, four uprights struck through by a diagonal.
-const groups = computed(() => {
+const groups = computed<number[]>(() => {
   const full = Math.floor(props.count / 5)
   const remainder = props.count % 5
   const result = Array.from({ length: full }, () => 5)
@@ -15,7 +13,7 @@ const groups = computed(() => {
   return result
 })
 
-const UPRIGHT_X = [3, 10, 17, 24]
+const UPRIGHT_X = [3, 10, 17, 24] as const
 </script>
 
 <template>
@@ -40,6 +38,6 @@ const UPRIGHT_X = [3, 10, 17, 24]
       />
       <line v-if="size === 5" x1="-1" y1="21" x2="28" y2="3" />
     </svg>
-    <span v-if="count === 0" class="text-sm text-white/20">—</span>
+    <span v-if="count === 0" class="text-sm text-white/20">&mdash;</span>
   </div>
 </template>

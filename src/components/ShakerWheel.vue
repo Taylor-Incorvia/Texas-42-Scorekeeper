@@ -1,26 +1,41 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import { TEAM_OF_SEAT } from '../composables/useGame.js'
+import { TEAM_OF_SEAT, type BySeat, type Seat, type Team } from '../composables/useGame'
 
-const props = defineProps({
-  names: { type: Array, required: true }, // resolved display names
-  rawNames: { type: Array, required: true }, // what the user actually typed
-  shaker: { type: Number, required: true },
-  turns: { type: Number, required: true },
-  started: { type: Boolean, default: false },
-})
+interface Props {
+  /** Resolved display names — falls back to "Player N". */
+  names: BySeat<string>
+  /** What the user actually typed, so empty seats keep their placeholder. */
+  rawNames: BySeat<string>
+  shaker: Seat
+  turns: number
+  started: boolean
+}
 
-const emit = defineEmits(['rename'])
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  rename: [seat: Seat, value: string]
+}>()
+
+interface SeatLayout {
+  seat: Seat
+  name: string
+  team: Team
+  left: number
+  top: number
+}
 
 const SEAT_RADIUS = 36 // % of the wheel's width, measured from the centre
 
 // In screen coordinates y grows downward, so an increasing angle sweeps
 // clockwise. Seat 0 sits due south at 90deg and each later seat is a further
 // quarter turn clockwise: left, top, right.
-const seatAngle = (seat) => 90 + 90 * seat
+const seatAngle = (seat: number): number => 90 + 90 * seat
 
-const seats = computed(() =>
-  props.names.map((name, seat) => {
+const seats = computed<SeatLayout[]>(() =>
+  props.names.map((name, index) => {
+    const seat = index as Seat
     const radians = (seatAngle(seat) * Math.PI) / 180
     return {
       seat,
@@ -35,6 +50,14 @@ const seats = computed(() =>
 // The hand is drawn pointing east, so it needs the same +90 offset as the
 // seats. Driving it off `turns` keeps the rotation monotonic (see useGame).
 const handRotation = computed(() => seatAngle(props.turns))
+
+function onRename(seat: Seat, event: Event): void {
+  emit('rename', seat, (event.target as HTMLInputElement).value)
+}
+
+function blurTarget(event: Event): void {
+  ;(event.target as HTMLInputElement).blur()
+}
 </script>
 
 <template>
@@ -50,7 +73,9 @@ const handRotation = computed(() => seatAngle(props.turns))
       :style="{ transform: `translateY(-50%) rotate(${handRotation}deg)` }"
     >
       <div class="h-full flex-1 rounded-full bg-gradient-to-r from-white/25 to-white"></div>
-      <div class="-ml-1 h-3.5 w-3.5 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"></div>
+      <div
+        class="-ml-1 h-3.5 w-3.5 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"
+      ></div>
     </div>
 
     <!-- hub -->
@@ -84,8 +109,8 @@ const handRotation = computed(() => seatAngle(props.turns))
           enterkeyhint="done"
           class="w-[5.5rem] bg-transparent text-center text-sm font-semibold outline-none placeholder:font-normal placeholder:text-white/35 focus:placeholder:text-white/20"
           :class="seat.team === 0 ? 'text-amber-200' : 'text-sky-200'"
-          @input="emit('rename', seat.seat, $event.target.value)"
-          @keydown.enter="$event.target.blur()"
+          @input="onRename(seat.seat, $event)"
+          @keydown.enter="blurTarget($event)"
         />
         <span
           class="text-[0.6rem] font-medium uppercase tracking-widest transition-opacity"

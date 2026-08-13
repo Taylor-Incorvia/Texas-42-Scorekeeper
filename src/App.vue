@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import ScoreBoard from './components/ScoreBoard.vue'
 import ShakerWheel from './components/ShakerWheel.vue'
 import HandEntry from './components/HandEntry.vue'
 import SetupPanel from './components/SetupPanel.vue'
 import WinnerOverlay from './components/WinnerOverlay.vue'
-import { useGame } from './composables/useGame.js'
-import { useWakeLock } from './composables/useWakeLock.js'
+import { useGame } from './composables/useGame'
+import { useWakeLock } from './composables/useWakeLock'
 
 const {
   names,
@@ -31,7 +31,7 @@ useWakeLock()
 
 const shakerName = computed(() => names.value[shaker.value])
 
-function confirmReset() {
+function confirmReset(): void {
   if (!canUndo.value || confirm('Start a new game? The current score will be cleared.')) {
     reset()
   }
@@ -40,10 +40,8 @@ function confirmReset() {
 
 <template>
   <div class="relative mx-auto flex h-full max-w-md flex-col px-4 pb-[env(safe-area-inset-bottom)]">
-    <header class="flex items-center justify-between pt-3 pb-2">
-      <h1 class="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-white/30">
-        42
-      </h1>
+    <header class="flex items-center justify-between pb-2 pt-3">
+      <h1 class="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-white/30">42</h1>
       <div class="flex items-center gap-1">
         <button
           type="button"
@@ -82,12 +80,7 @@ function confirmReset() {
 
     <footer class="pb-4">
       <SetupPanel v-if="!started" :names="names" @start="startWith" @shuffle="startRandom" />
-      <HandEntry
-        v-else
-        :team-names="teamNames"
-        :shaker-name="shakerName"
-        @record="recordHand"
-      />
+      <HandEntry v-else :team-names="teamNames" :shaker-name="shakerName" @record="recordHand" />
     </footer>
 
     <WinnerOverlay

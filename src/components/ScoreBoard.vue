@@ -1,17 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import TallyMarks from './TallyMarks.vue'
-import { TARGET_MARKS } from '../composables/useGame.js'
+import { TARGET_MARKS, type ByTeam, type Team } from '../composables/useGame'
 
-defineProps({
-  teamNames: { type: Array, required: true },
-  scores: { type: Array, required: true },
-})
+defineProps<{
+  teamNames: ByTeam<string>
+  scores: ByTeam<number>
+}>()
+
+const TEAMS: readonly Team[] = [0, 1]
 </script>
 
 <template>
   <div class="flex items-stretch gap-2">
     <div
-      v-for="team in [0, 1]"
+      v-for="team in TEAMS"
       :key="team"
       class="flex flex-1 flex-col items-center gap-1 rounded-2xl border px-2 py-3"
       :class="

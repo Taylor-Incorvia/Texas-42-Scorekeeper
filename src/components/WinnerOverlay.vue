@@ -1,11 +1,19 @@
-<script setup>
-defineProps({
-  team: { type: Number, required: true },
-  teamNames: { type: Array, required: true },
-  scores: { type: Array, required: true },
-})
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { ByTeam, Team } from '../composables/useGame'
 
-const emit = defineEmits(['rematch', 'undo'])
+const props = defineProps<{
+  team: Team
+  teamNames: ByTeam<string>
+  scores: ByTeam<number>
+}>()
+
+const emit = defineEmits<{
+  rematch: []
+  undo: []
+}>()
+
+const loser = computed<Team>(() => (props.team === 0 ? 1 : 0))
 </script>
 
 <template>
@@ -21,7 +29,7 @@ const emit = defineEmits(['rematch', 'undo'])
         {{ teamNames[team] }}
       </h2>
       <p class="text-lg font-semibold tabular-nums text-white/70">
-        {{ scores[team] }} &ndash; {{ scores[team === 0 ? 1 : 0] }}
+        {{ scores[team] }} &ndash; {{ scores[loser] }}
       </p>
     </div>
 

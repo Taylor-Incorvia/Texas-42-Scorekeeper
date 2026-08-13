@@ -31,9 +31,13 @@ doesn't lose it.
 
 ```sh
 npm install
-npm run dev     # --host is on, so you can open it on your phone over wifi
-npm run build
+npm run dev         # --host is on, so you can open it on your phone over wifi
+npm run type-check  # vue-tsc, checks inside SFC templates too
+npm run build       # type-checks first, then bundles
 ```
+
+Vue 3 + TypeScript + Tailwind v4, built with Vite. `src/composables/useGame.ts`
+holds the whole game; the components are presentational.
 
 ## Deploying
 

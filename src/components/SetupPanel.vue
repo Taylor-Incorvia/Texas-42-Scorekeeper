@@ -1,11 +1,14 @@
-<script setup>
-import { TEAM_OF_SEAT } from '../composables/useGame.js'
+<script setup lang="ts">
+import { TEAM_OF_SEAT, type BySeat, type Seat } from '../composables/useGame'
 
-defineProps({
-  names: { type: Array, required: true },
-})
+defineProps<{
+  names: BySeat<string>
+}>()
 
-const emit = defineEmits(['start', 'shuffle'])
+const emit = defineEmits<{
+  start: [seat: Seat]
+  shuffle: []
+}>()
 </script>
 
 <template>
@@ -19,11 +22,11 @@ const emit = defineEmits(['start', 'shuffle'])
         type="button"
         class="truncate rounded-2xl border px-3 py-3.5 text-sm font-semibold transition-transform active:scale-[0.97]"
         :class="
-          TEAM_OF_SEAT[seat] === 0
+          TEAM_OF_SEAT[seat as Seat] === 0
             ? 'border-amber-400/40 bg-amber-400/10 text-amber-200'
             : 'border-sky-400/40 bg-sky-400/10 text-sky-200'
         "
-        @click="emit('start', seat)"
+        @click="emit('start', seat as Seat)"
       >
         {{ name }}
       </button>

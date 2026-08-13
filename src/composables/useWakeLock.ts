@@ -2,13 +2,13 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 /**
  * Keeps the screen awake while the app is open — the phone sits on the table
- * between hands, and having to wake and unlock it every round defeats the
+ * between rounds, and having to wake and unlock it every time defeats the
  * point of not using paper. Unsupported browsers just no-op.
  */
-export function useWakeLock() {
-  let sentinel = null
+export function useWakeLock(): void {
+  let sentinel: WakeLockSentinel | null = null
 
-  async function acquire() {
+  async function acquire(): Promise<void> {
     if (!('wakeLock' in navigator) || document.visibilityState !== 'visible') return
     try {
       sentinel = await navigator.wakeLock.request('screen')
@@ -22,18 +22,18 @@ export function useWakeLock() {
 
   // The lock is dropped whenever the tab is hidden, so it has to be retaken
   // every time the player comes back to the app.
-  function onVisibilityChange() {
-    if (document.visibilityState === 'visible' && !sentinel) acquire()
+  function onVisibilityChange(): void {
+    if (document.visibilityState === 'visible' && !sentinel) void acquire()
   }
 
   onMounted(() => {
-    acquire()
+    void acquire()
     document.addEventListener('visibilitychange', onVisibilityChange)
   })
 
   onBeforeUnmount(() => {
     document.removeEventListener('visibilitychange', onVisibilityChange)
-    sentinel?.release?.()
+    void sentinel?.release()
     sentinel = null
   })
 }
