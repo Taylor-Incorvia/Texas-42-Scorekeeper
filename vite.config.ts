@@ -8,4 +8,8 @@ export default defineConfig({
   // renamed — or moved to a custom domain — without touching the config.
   base: './',
   plugins: [vue(), tailwindcss()],
+  server: {
+    // Let a Cloudflare quick tunnel reach the dev server for phone testing.
+    allowedHosts: ['.trycloudflare.com'],
+  },
 })

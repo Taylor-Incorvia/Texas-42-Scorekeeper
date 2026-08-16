@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import ConfettiBurst from './ConfettiBurst.vue'
 import type { ByTeam, Team } from '../composables/useGame'
 
 const props = defineProps<{
@@ -14,13 +15,24 @@ const emit = defineEmits<{
 }>()
 
 const loser = computed<Team>(() => (props.team === 0 ? 1 : 0))
+
+// The winning team's colours, warmed up with white so the paper stays readable
+// against the dark felt.
+const CONFETTI: ByTeam<string[]> = [
+  ['#fcd34d', '#f59e0b', '#fde68a', '#ffffff'],
+  ['#7dd3fc', '#0ea5e9', '#bae6fd', '#ffffff'],
+]
+
+const confettiColors = computed(() => CONFETTI[props.team])
 </script>
 
 <template>
   <div
     class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 bg-felt/90 px-6 backdrop-blur-sm"
   >
-    <div class="flex flex-col items-center gap-2 text-center">
+    <ConfettiBurst :colors="confettiColors" />
+
+    <div class="relative flex flex-col items-center gap-2 text-center">
       <span class="text-[0.7rem] uppercase tracking-[0.3em] text-white/40">Game</span>
       <h2
         class="text-3xl font-bold leading-tight"
@@ -33,7 +45,7 @@ const loser = computed<Team>(() => (props.team === 0 ? 1 : 0))
       </p>
     </div>
 
-    <div class="flex w-full max-w-xs flex-col gap-2">
+    <div class="relative flex w-full max-w-xs flex-col gap-2">
       <button
         type="button"
         class="rounded-2xl bg-white py-3.5 text-base font-semibold text-felt transition-transform active:scale-[0.98]"

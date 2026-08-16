@@ -18,16 +18,19 @@ const {
   scores,
   winner,
   canUndo,
+  pendingBid,
   setName,
   startWith,
   startRandom,
-  recordHand,
+  recordRound,
   undo,
   rematch,
   reset,
 } = useGame()
 
-useWakeLock()
+// iOS can only take the lock once the player has tapped something, so this
+// starts out false and clears itself the moment the board is touched.
+const { active: screenAwake } = useWakeLock()
 
 const shakerName = computed(() => names.value[shaker.value])
 
@@ -41,7 +44,10 @@ function confirmReset(): void {
 <template>
   <div class="relative mx-auto flex h-full max-w-md flex-col px-4 pb-[env(safe-area-inset-bottom)]">
     <header class="flex items-center justify-between pb-2 pt-3">
-      <h1 class="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-white/30">42</h1>
+      <div class="flex items-baseline gap-2">
+        <h1 class="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-white/30">42</h1>
+        <span v-if="!screenAwake" class="text-[0.6rem] text-white/25">screen may sleep</span>
+      </div>
       <div class="flex items-center gap-1">
         <button
           type="button"
@@ -80,7 +86,13 @@ function confirmReset(): void {
 
     <footer class="pb-4">
       <SetupPanel v-if="!started" :names="names" @start="startWith" @shuffle="startRandom" />
-      <HandEntry v-else :team-names="teamNames" :shaker-name="shakerName" @record="recordHand" />
+      <HandEntry
+        v-else
+        v-model:bid="pendingBid"
+        :team-names="teamNames"
+        :shaker-name="shakerName"
+        @record="recordRound"
+      />
     </footer>
 
     <WinnerOverlay
